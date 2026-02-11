@@ -26,7 +26,7 @@ export function APICard({
   };
 
   return (
-    <div className="flex items-center justify-between rounded-xl border border-orange-200 bg-white p-4 shadow-sm shadow-orange-100">
+    <div className="flex items-center justify-between rounded-xl border border-orange-200 bg-card p-4 shadow-sm shadow-orange-100">
       <div className="flex items-center gap-3">
         <span
           className={`rounded-md px-2 py-1 text-xs font-semibold ${METHOD_COLORS[method] || "bg-slate-100 text-slate-700"}`}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { Bot, User } from "lucide-react";
 
 const STATUS_COLORS = {
@@ -18,16 +18,9 @@ function getStatusColor(status) {
 export function LogStream({ logs }) {
   const containerRef = useRef(null);
 
-  // Auto-scroll to bottom on new logs
-  useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollTop = containerRef.current.scrollHeight;
-    }
-  }, [logs]);
-
   if (logs.length === 0) {
     return (
-      <div className="rounded-xl border border-orange-200 bg-white p-6 shadow-sm shadow-orange-100">
+      <div className="rounded-xl border border-orange-200 bg-card p-6 shadow-sm shadow-orange-100">
         <h3 className="mb-4 text-sm font-semibold text-slate-900">
           Log Stream
         </h3>
@@ -39,16 +32,16 @@ export function LogStream({ logs }) {
   }
 
   return (
-    <div className="rounded-xl border border-orange-200 bg-white p-4 shadow-sm shadow-orange-100">
+    <div className="rounded-xl border border-orange-200 bg-card p-4 shadow-sm shadow-orange-100">
       <h3 className="mb-4 text-sm font-semibold text-slate-900">Log Stream</h3>
       <div
         ref={containerRef}
         className="log-stream h-64 space-y-2 overflow-y-auto rounded-lg bg-slate-50 p-3"
       >
-        {logs.map((log) => (
+        {[...logs].reverse().map((log, index) => (
           <div
-            key={log.id}
-            className="flex items-center gap-3 rounded-lg bg-white p-2 text-sm shadow-sm"
+            key={index}
+            className="flex items-center gap-3 rounded-lg bg-card p-2 text-sm shadow-sm"
           >
             {/* Timestamp */}
             <span className="shrink-0 font-mono text-xs text-slate-400">
@@ -94,7 +87,7 @@ export function LogStream({ logs }) {
             </span>
 
             {/* Latency */}
-            <span className="shrink-0 text-xs text-slate-400">
+            <span className="w-8 shrink-0 text-right text-xs text-slate-400">
               {log.latency}ms
             </span>
           </div>

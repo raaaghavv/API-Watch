@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-export function LatencyChart({ logs }) {
+export function LatencyChart({ logs, className = "" }) {
   const chartData = useMemo(() => {
     // Group last 20 logs for the chart
     return logs.slice(-20).map((log, index) => ({
@@ -27,11 +27,13 @@ export function LatencyChart({ logs }) {
   }, [logs]);
 
   return (
-    <div className="rounded-xl border border-orange-200 bg-white p-4 shadow-sm shadow-orange-100">
+    <div
+      className={`flex flex-col rounded-xl border border-orange-200 bg-card p-4 shadow-sm shadow-orange-100 ${className}`}
+    >
       <h3 className="mb-4 text-sm font-semibold text-slate-900">
         Latency Over Time
       </h3>
-      <div className="h-48">
+      <div className="flex-1 min-h-48">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData}>
             <defs>

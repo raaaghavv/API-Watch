@@ -1,15 +1,23 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useCallback, useRef } from "react";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 export function useSSE() {
   const [logs, setLogs] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
+  const [totalRequests, setTotalRequests] = useState(0);
+  const [totalErrors, setTotalErrors] = useState(0);
   const eventSourceRef = useRef(null);
 
-  useEffect(() => {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-    const eventSource = new EventSource(`${apiUrl}/api/logs/stream`);
+  const connect = useCallback(() => {
+    // Close existing connection if any
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+    }
+
+    const eventSource = new EventSource(`${API_URL}/api/logs/stream`);
     eventSourceRef.current = eventSource;
 
     eventSource.onopen = () => {
@@ -19,7 +27,11 @@ export function useSSE() {
     eventSource.onmessage = (event) => {
       try {
         const log = JSON.parse(event.data);
-        setLogs((prev) => [...prev.slice(-99), log]); // Keep last 100 logs
+        setTotalRequests((prev) => prev + 1);
+        if (log.status >= 400 || log.status === 0) {
+          setTotalErrors((prev) => prev + 1);
+        }
+        setLogs((prev) => [...prev.slice(-99), log]);
       } catch (err) {
         console.error("Failed to parse SSE message:", err);
       }
@@ -28,16 +40,20 @@ export function useSSE() {
     eventSource.onerror = () => {
       setIsConnected(false);
     };
+  }, []);
 
-    return () => {
-      eventSource.close();
-    };
+  const disconnect = useCallback(() => {
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+      eventSourceRef.current = null;
+    }
+    setIsConnected(false);
   }, []);
 
   // Compute stats from logs
   const stats = {
-    totalRequests: logs.length,
-    errors: logs.filter((l) => l.status >= 400 || l.status === 0).length,
+    totalRequests,
+    errors: totalErrors,
     avgLatency:
       logs.length > 0
         ? Math.round(
@@ -55,9 +71,8 @@ export function useSSE() {
   };
 
   const triggerAPI = useCallback(async (endpoint, method = "GET") => {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
     try {
-      await fetch(`${apiUrl}/api/trigger/${endpoint}`, {
+      await fetch(`${API_URL}/api/trigger/${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ method }),
@@ -67,5 +82,5 @@ export function useSSE() {
     }
   }, []);
 
-  return { logs, isConnected, stats, triggerAPI };
+  return { logs, isConnected, stats, triggerAPI, connect, disconnect };
 }

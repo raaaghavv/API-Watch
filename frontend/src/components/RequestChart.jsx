@@ -12,7 +12,7 @@ import {
   Legend,
 } from "recharts";
 
-export function RequestChart({ logs }) {
+export function RequestChart({ logs, className = "" }) {
   const chartData = useMemo(() => {
     // Group logs by time intervals (every 5 seconds)
     const grouped = {};
@@ -44,11 +44,13 @@ export function RequestChart({ logs }) {
   }, [logs]);
 
   return (
-    <div className="rounded-xl border border-orange-200 bg-white p-4 shadow-sm shadow-orange-100">
+    <div
+      className={`flex flex-col rounded-xl border border-orange-200 bg-card p-4 shadow-sm shadow-orange-100 ${className}`}
+    >
       <h3 className="mb-4 text-sm font-semibold text-slate-900">
         Requests by Status
       </h3>
-      <div className="h-48">
+      <div className="flex-1 min-h-48">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />

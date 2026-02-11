@@ -39,7 +39,7 @@ export function StatsBar({ stats }) {
       {statItems.map((item) => (
         <div
           key={item.label}
-          className="flex items-center gap-4 rounded-xl border border-orange-200 bg-white p-4 shadow-sm shadow-orange-100"
+          className="flex items-center gap-4 rounded-xl border border-orange-200 bg-card p-4 shadow-sm shadow-orange-100"
         >
           <div
             className={`flex h-12 w-12 items-center justify-center rounded-lg ${item.bgColor}`}

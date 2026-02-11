@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+
 import { Header } from "@/components/Header";
 import { StatsBar } from "@/components/StatsBar";
 import { APICard } from "@/components/APICard";
@@ -38,23 +40,41 @@ const API_ENDPOINTS = [
 ];
 
 export default function Dashboard() {
-  const { logs, isConnected, stats, triggerAPI } = useSSE();
+  const { logs, isConnected, stats, triggerAPI, connect, disconnect } =
+    useSSE();
+
+  // Auto-connect on mount
+  useEffect(() => {
+    connect();
+    return () => disconnect();
+  }, [connect, disconnect]);
 
   // Enable health polling when connected
-  useHealthPoll(isConnected, 5000);
+  useHealthPoll(isConnected, 8000);
+
+  const handleToggleConnection = () => {
+    if (isConnected) {
+      disconnect();
+    } else {
+      connect();
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <Header isConnected={isConnected} />
+    <div className="min-h-screen">
+      <Header
+        isConnected={isConnected}
+        onToggleConnection={handleToggleConnection}
+      />
 
-      <main className="mx-auto max-w-7xl px-6 py-6">
+      <main className="mx-auto max-w-360 px-6 py-6">
         {/* Stats Bar */}
         <section className="mb-6">
           <StatsBar stats={stats} />
         </section>
 
-        {/* Main Content Grid */}
-        <div className="mb-6 grid gap-6 lg:grid-cols-3">
+        {/* Main Content Grid - 4 columns */}
+        <div className="mb-6 grid gap-6 lg:grid-cols-4">
           {/* API Cards */}
           <div className="space-y-3 lg:col-span-1">
             <h2 className="text-sm font-semibold text-slate-900">
@@ -72,10 +92,14 @@ export default function Dashboard() {
             ))}
           </div>
 
-          {/* Charts */}
-          <div className="space-y-4 lg:col-span-2">
-            <LatencyChart logs={logs} />
-            <RequestChart logs={logs} />
+          {/* Latency Chart */}
+          <div className="lg:col-span-2">
+            <LatencyChart logs={logs} className="h-full" />
+          </div>
+
+          {/* Request Chart */}
+          <div className="lg:col-span-1">
+            <RequestChart logs={logs} className="h-full" />
           </div>
         </div>
 
