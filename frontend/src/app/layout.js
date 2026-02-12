@@ -15,6 +15,9 @@ export const metadata = {
   title: "API Watch - Real-time Monitoring Dashboard",
   description:
     "Monitor your APIs in real-time with live charts and log streaming",
+  icons: {
+    icon: "/api_watch_logo.png",
+  },
 };
 
 export default function RootLayout({ children }) {
